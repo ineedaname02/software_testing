@@ -1,3 +1,8 @@
+# LLM AI Gateway Dashboard: Selenium Testing
+
+![Ubuntu Tests](https://github.com/ineedaname02/software_testing/actions/workflows/test-ubuntu.yml/badge.svg)
+![Windows Tests](https://github.com/ineedaname02/software_testing/actions/workflows/test-windows.yml/badge.svg)
+
 A web dashboard for an LLM AI gateway (8 models, 6% SST, 50% batch API discount)
 with an automated Selenium test suite.
 
