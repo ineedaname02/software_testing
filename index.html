@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Dashboard</title>
+<style>
+:root{--ink:#10222b;--mut:#5b6f79;--line:#d6e0e4;--bg:#eef3f4;--acc:#0f766e;--acc-d:#0b5a54;--bad:#b42318;--badbg:#fdecea}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,Arial,sans-serif;font-variant-numeric:tabular-nums}
+header{background:var(--acc-d);color:#fff;padding:26px 20px 44px}
+.wrap{max-width:940px;margin:0 auto}
+header h1{margin:0;font-size:27px;font-weight:650;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:#b9e3de}
+main{margin-top:-24px;padding:0 20px 40px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px;margin-bottom:18px}
+h2{margin:0 0 14px;font-size:17px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-size:13px;color:var(--mut);font-weight:600}
+.num{text-align:right}
+td.prov{color:var(--mut)}
+input[type=number]{width:110px;padding:7px 9px;border:1px solid #9fb2ba;border-radius:6px;font:inherit;text-align:right}
+input[type=number]:focus,button:focus-visible,input[type=checkbox]:focus-visible{outline:3px solid #7cc7bf;outline-offset:1px}
+.actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-top:18px}
+.toggle{display:flex;align-items:center;gap:10px;cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--acc)}
+.toggle small{color:var(--mut)}
+button{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:11px 26px;font:600 15px inherit;font-family:inherit;cursor:pointer}
+button:hover{background:var(--acc-d)}
+#error_msg{background:var(--badbg);color:var(--bad);border:1px solid #f1b8b2;border-radius:8px;padding:10px 14px;margin-top:16px;white-space:pre-line}
+.sum td:first-child{color:var(--mut)}
+.sum tr.total td{border-bottom:0;padding-top:14px;font-size:20px;font-weight:700;color:var(--acc-d)}
+.sum tr.total td:first-child{color:var(--ink)}
+.empty{color:var(--mut);text-align:center}
+@media(max-width:600px){th:nth-child(3),td.prov{display:none}input[type=number]{width:84px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>LLM Dashboard</h1>
+  <p>One API for eight models. Enter your monthly usage to see what you owe.</p>
+</div></header>
+
+<main><div class="wrap">
+  <section class="card">
+    <h2>Models and usage</h2>
+    <table>
+      <thead><tr><th>Model</th><th>Provider</th><th class="num">Price (RM per 1M tokens)</th><th class="num">Usage (M tokens)</th></tr></thead>
+      <tbody id="model_rows"></tbody>
+    </table>
+    <div class="actions">
+      <label class="toggle">
+        <input type="checkbox" id="batch_toggle">
+        <span>Use Batch API <small>(50% off all prices)</small></span>
+      </label>
+      <button type="button" id="calc_button">Calculate Usage</button>
+    </div>
+    <div id="error_msg" role="alert" hidden></div>
+  </section>
+
+  <section class="card" id="result_card" hidden>
+    <h2>Usage summary</h2>
+    <table class="sum">
+      <thead><tr><th>Model</th><th class="num">Usage (M tokens)</th><th class="num">Price (RM)</th><th class="num">Cost (RM)</th></tr></thead>
+      <tbody id="summary_body"></tbody>
+      <tfoot>
+        <tr><td colspan="3">Subtotal</td><td class="num" id="sum_subtotal"></td></tr>
+        <tr><td colspan="3">Batch API discount (50%)</td><td class="num" id="sum_discount"></td></tr>
+        <tr><td colspan="3">SST (6%)</td><td class="num" id="sum_sst"></td></tr>
+        <tr class="total"><td colspan="3">Total to pay (RM)</td><td class="num" id="total_amount"></td></tr>
+      </tfoot>
+    </table>
+  </section>
+</div></main>
+
+<script>
+// name, provider, price in sen (RM x 100) per 1M tokens
+const MODELS = [
+  ["GPT-5.2 Turbo",     "OpenAI",    1380],
+  ["GPT-5 Mini",        "OpenAI",     185],
+  ["Claude Sonnet 5.5", "Anthropic", 1140],
+  ["Claude Haiku 5.5",  "Anthropic",  375],
+  ["Gemini 3 Pro",      "Google",     920],
+  ["Gemini 3 Flash",    "Google",      95],
+  ["Llama 4 Maverick",  "Meta",       260],
+  ["Mistral Large 3",   "Mistral AI", 635]
+];
+const MAX_USAGE = 1000000;   // upper limit per model (M tokens)
+const rm = sen => (sen / 100).toFixed(2);
+
+// Pure billing logic. All money is kept as whole sen, rounded half-up.
+// Order: line cost -> subtotal -> batch discount -> SST on discounted amount.
+function calculate(usages, batch) {
+  const lines = []; let sub = 0;
+  usages.forEach((q, i) => {
+    if (q > 0) { const c = Math.round(MODELS[i][2] * q); lines.push({ i, q, c }); sub += c; }
+  });
+  const disc = batch ? Math.floor((sub + 1) / 2) : 0;
+  const base = sub - disc;
+  const sst = Math.floor((base * 6 + 50) / 100);
+  return { lines, sub, disc, sst, total: base + sst };
+}
+
+function cell(tr, text, cls) {
+  const td = document.createElement("td");
+  td.textContent = text; if (cls) td.className = cls; tr.appendChild(td);
+}
+
+// Build the input rows (textContent only, never innerHTML)
+const rows = document.getElementById("model_rows");
+MODELS.forEach((m, i) => {
+  const tr = document.createElement("tr");
+  cell(tr, m[0]); cell(tr, m[1], "prov"); cell(tr, rm(m[2]), "num");
+  const td = document.createElement("td"); td.className = "num";
+  const inp = document.createElement("input");
+  Object.assign(inp, { type: "number", id: "qty" + (i + 1), name: "qty" + (i + 1), min: "0", step: "any", value: "0" });
+  inp.setAttribute("aria-label", m[0] + " usage in millions of tokens");
+  td.appendChild(inp); tr.appendChild(td); rows.appendChild(tr);
+});
+
+function showError(msgs) {
+  const box = document.getElementById("error_msg");
+  box.textContent = msgs.join("\n"); box.hidden = false;
+  document.getElementById("result_card").hidden = true;
+}
+
+function onCalculate() {
+  const errors = [], usages = [];
+  MODELS.forEach((m, i) => {
+    const el = document.getElementById("qty" + (i + 1));
+    const v = el.value.trim();
+    if (el.validity.badInput) { errors.push(m[0] + ": usage must be a number."); usages.push(0); return; }
+    const n = v === "" ? 0 : Number(v);
+    if (!Number.isFinite(n)) errors.push(m[0] + ": usage must be a number.");
+    else if (n < 0) errors.push(m[0] + ": usage cannot be negative.");
+    else if (n > MAX_USAGE) errors.push(m[0] + ": usage cannot exceed " + MAX_USAGE + " M tokens.");
+    usages.push(n);
+  });
+  if (errors.length) { showError(errors); return; }
+
+  document.getElementById("error_msg").hidden = true;
+  const batch = document.getElementById("batch_toggle").checked;
+  const r = calculate(usages, batch);
+  const body = document.getElementById("summary_body");
+  body.replaceChildren();
+  if (!r.lines.length) {
+    const tr = document.createElement("tr");
+    cell(tr, "No usage entered. Add usage above and calculate again.", "empty");
+    tr.firstChild.colSpan = 4; body.appendChild(tr);
+  }
+  r.lines.forEach(l => {
+    const tr = document.createElement("tr");
+    cell(tr, MODELS[l.i][0]); cell(tr, String(l.q), "num");
+    cell(tr, rm(MODELS[l.i][2]), "num"); cell(tr, rm(l.c), "num");
+    body.appendChild(tr);
+  });
+  document.getElementById("sum_subtotal").textContent = rm(r.sub);
+  document.getElementById("sum_discount").textContent = batch ? "-" + rm(r.disc) : "0.00";
+  document.getElementById("sum_sst").textContent = rm(r.sst);
+  document.getElementById("total_amount").textContent = rm(r.total);
+  document.getElementById("result_card").hidden = false;
+}
+document.getElementById("calc_button").addEventListener("click", onCalculate);
+</script>
+</body>
+</html>

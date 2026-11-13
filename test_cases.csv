@@ -1,0 +1,11 @@
+test_id,description,qty1,qty2,qty3,qty4,qty5,qty6,qty7,qty8,batch,expected_total
+TC01,"Single model, whole number",2,0,0,0,0,0,0,0,no,29.26
+TC02,"Three models, mixed usage",0,10,0,5,0,20,0,0,no,59.63
+TC03,"All 8 models, 1M tokens each",1,1,1,1,1,1,1,1,no,52.89
+TC04,Boundary: zero usage on all models,0,0,0,0,0,0,0,0,no,0.00
+TC05,Decimal usage on two models,0,0,0.5,0,0,0,0,2.5,no,22.87
+TC06,Large usage on two models,1000,0,0,0,500,0,0,0,no,19504.00
+TC07,"Batch API on, single model",2,0,0,0,0,0,0,0,yes,14.63
+TC08,"Batch API on, three models",0,0,4,0,3,0,10,0,yes,52.58
+TC09,"Rounding: half-sen lines and odd subtotal, batch on",0,0.5,0,0,0,0.5,0,0,yes,0.74
+TC10,"All 8 models with different usage, batch on",1,2,3,4,5,6,7,8,yes,99.32

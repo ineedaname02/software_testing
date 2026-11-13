@@ -1,0 +1,76 @@
+# Runs the Selenium test suite for the AI Gateway Dashboard on Ubuntu.
+# Save this file as: .github/workflows/test-ubuntu.yml
+name: Ubuntu Tests
+
+# Manual trigger only: use the "Run workflow" button on the Actions tab.
+on:
+  workflow_dispatch:
+
+jobs:
+  selenium-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30          # stop the job automatically if it stalls
+
+    steps:
+      # 1. Get the repository code onto the runner
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # 2. Install Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 3. Install the Python dependencies listed in requirements.txt
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      # 4. Install Chrome and a matching ChromeDriver; the paths become step outputs
+      - name: Set up Chrome and ChromeDriver
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: stable
+          install-chromedriver: true
+
+      # 5. Launch the web server in the background and wait until the page responds
+      - name: Start web server
+        run: |
+          nohup python -m http.server 8000 > server.log 2>&1 &
+          for i in $(seq 1 15); do
+            curl -sf http://localhost:8000/index.html > /dev/null && echo "Server is up" && exit 0
+            sleep 1
+          done
+          echo "Server did not start" && cat server.log && exit 1
+
+      # 6. Run the test script (reads test_cases.csv, drives Chrome, saves results.csv and screenshots).
+      #    These variables are read by run_tests.py. HEADLESS=1 because the runner has no display.
+      - name: Run Selenium tests
+        env:
+          APP_URL: http://localhost:8000/index.html
+          CHROME_BINARY: ${{ steps.setup-chrome.outputs.chrome-path }}
+          CHROMEDRIVER_PATH: ${{ steps.setup-chrome.outputs.chromedriver-path }}
+          HEADLESS: "1"
+        run: python run_tests.py
+
+      # 7. Build the HTML report (runs even when tests fail)
+      - name: Generate test report
+        if: always()
+        env:
+          REPORT_PLATFORM: Ubuntu
+        run: python generate_report.py
+
+      # 8. Upload the report and screenshots as build artifacts (even when tests fail)
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report-ubuntu
+          path: test_report.html
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-ubuntu
+          path: screenshots/
