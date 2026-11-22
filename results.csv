@@ -1,11 +1,11 @@
 test_id,description,expected,actual,status,reason,seconds,screenshot
-TC01,"Single model, whole number",29.26,29.26,PASS,,1.46,TC01_PASS_20261113_184412.png
-TC02,"Three models, mixed usage",59.63,59.63,PASS,,1.18,TC02_PASS_20261113_184413.png
-TC03,"All 8 models, 1M tokens each",52.89,52.89,PASS,,1.17,TC03_PASS_20261113_184414.png
-TC04,Boundary: zero usage on all models,0.00,0.00,PASS,,1.13,TC04_PASS_20261113_184415.png
-TC05,Decimal usage on two models,22.87,22.87,PASS,,1.14,TC05_PASS_20261113_184417.png
-TC06,Large usage on two models,19504.00,19504.00,PASS,,1.16,TC06_PASS_20261113_184418.png
-TC07,"Batch API on, single model",14.63,14.63,PASS,,1.18,TC07_PASS_20261113_184419.png
-TC08,"Batch API on, three models",52.58,52.58,PASS,,1.19,TC08_PASS_20261113_184420.png
-TC09,"Rounding: half-sen lines and odd subtotal, batch on",0.74,0.74,PASS,,1.17,TC09_PASS_20261113_184421.png
-TC10,"All 8 models with different usage, batch on",99.32,99.32,PASS,,1.2,TC10_PASS_20261113_184423.png
+TC01,"Single model used, whole number for token used",29.26,29.26,PASS,,2.21,TC01_PASS_20261121_010527.png
+TC02,"Three models, mixed usage and whole number",59.63,59.63,PASS,,1.54,TC02_PASS_20261121_010528.png
+TC03,"All 8 models, 1M tokens each",52.89,52.89,PASS,,1.61,TC03_PASS_20261121_010530.png
+TC04,Boundary: zero usage on all models,0,0.00,PASS,,1.63,TC04_PASS_20261121_010532.png
+TC05,Decimal usage on two models,22.87,22.87,PASS,,1.75,TC05_PASS_20261121_010533.png
+TC06,Large usage on two models,19504,19504.00,PASS,,1.78,TC06_PASS_20261121_010535.png
+TC07,"Batch API on, single model",14.63,14.63,PASS,,1.97,TC07_PASS_20261121_010537.png
+TC08,"Batch API on, three models",52.58,52.58,PASS,,1.79,TC08_PASS_20261121_010539.png
+TC09,"Rounding: half-sen lines and odd subtotal, batch API on",0.74,0.74,PASS,,2.01,TC09_PASS_20261121_010541.png
+TC10,"All 8 models with different usage, batch API on",99.32,99.32,PASS,,1.79,TC10_PASS_20261121_010543.png
