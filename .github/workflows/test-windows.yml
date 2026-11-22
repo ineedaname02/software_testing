@@ -1,17 +1,14 @@
-# Runs the Selenium test suite for the AI Gateway Dashboard on Windows.
-# Save this file as: .github/workflows/test-windows.yml
+
 name: Windows Tests
 
-# Manual trigger only: use the "Run workflow" button on the Actions tab.
 on:
   workflow_dispatch:
 
 jobs:
   selenium-tests:
     runs-on: windows-latest
-    timeout-minutes: 30          # stop the job automatically if it stalls
+    timeout-minutes: 30
 
-    # Windows runners use PowerShell by default; set it explicitly so every run: step is PowerShell.
     defaults:
       run:
         shell: pwsh
@@ -28,7 +25,6 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
-      # Chrome and ChromeDriver for Windows (paths are step outputs)
       - name: Set up Chrome and ChromeDriver
         id: setup-chrome
         uses: browser-actions/setup-chrome@v2
@@ -36,8 +32,6 @@ jobs:
           chrome-version: stable
           install-chromedriver: true
 
-      # Windows difference: no "nohup ... &". Start-Process launches the server in the background,
-      # and Invoke-WebRequest (instead of curl) polls until the page responds.
       - name: Start web server
         run: |
           Start-Process -FilePath python -ArgumentList "-m","http.server","8000" -WindowStyle Hidden
