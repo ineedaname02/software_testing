@@ -1,15 +1,13 @@
-# Runs the Selenium test suite for the AI Gateway Dashboard on Ubuntu.
-# Save this file as: .github/workflows/test-ubuntu.yml
+
 name: Ubuntu Tests
 
-# Manual trigger only: use the "Run workflow" button on the Actions tab.
 on:
   workflow_dispatch:
 
 jobs:
   selenium-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 30          # stop the job automatically if it stalls
+    timeout-minutes: 30
 
     steps:
       # 1. Get the repository code onto the runner
@@ -45,7 +43,6 @@ jobs:
           echo "Server did not start" && cat server.log && exit 1
 
       # 6. Run the test script (reads test_cases.csv, drives Chrome, saves results.csv and screenshots).
-      #    These variables are read by run_tests.py. HEADLESS=1 because the runner has no display.
       - name: Run Selenium tests
         env:
           APP_URL: http://localhost:8000/index.html
