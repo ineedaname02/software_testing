@@ -89,8 +89,6 @@ const MODELS = [
 const MAX_USAGE = 1000000;   // upper limit per model (M tokens)
 const rm = sen => (sen / 100).toFixed(2);
 
-// Pure billing logic. All money is kept as whole sen, rounded half-up.
-// Order: line cost -> subtotal -> batch discount -> SST on discounted amount.
 function calculate(usages, batch) {
   const lines = []; let sub = 0;
   usages.forEach((q, i) => {
@@ -124,6 +122,8 @@ function showError(msgs) {
   box.textContent = msgs.join("\n"); box.hidden = false;
   document.getElementById("result_card").hidden = true;
 }
+
+
 
 function onCalculate() {
   const errors = [], usages = [];
@@ -162,6 +162,11 @@ function onCalculate() {
   document.getElementById("result_card").hidden = false;
 }
 document.getElementById("calc_button").addEventListener("click", onCalculate);
+
+// Hide a stale summary as soon as any input or the batch toggle changes
+function invalidate() { document.getElementById("result_card").hidden = true; }
+document.getElementById("model_rows").addEventListener("input", invalidate);
+document.getElementById("batch_toggle").addEventListener("change", invalidate);
 </script>
 </body>
 </html>
