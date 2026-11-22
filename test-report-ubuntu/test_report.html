@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Test Report - AI Gateway Dashboard (Ubuntu)</title>
+<style>
+body{font:15px/1.5 "Segoe UI",Arial,sans-serif;background:#eef3f4;color:#10222b;margin:0}
+header{background:#0b5a54;color:#fff;padding:22px 28px}
+header h1{margin:0;font-size:24px} header p{margin:4px 0 0;opacity:.85}
+main{max-width:980px;margin:0 auto;padding:20px}
+.cards{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.card{background:#fff;border:1px solid #d6e0e4;border-radius:10px;padding:14px 18px;flex:1;min-width:130px}
+.card b{display:block;font-size:26px} .card span{color:#5b6f79;font-size:13px}
+section{background:#fff;border:1px solid #d6e0e4;border-radius:10px;padding:18px;margin-bottom:18px}
+h2{margin:0 0 12px;font-size:17px}
+.stack{display:flex;height:22px;border-radius:6px;overflow:hidden;background:#e2e8f0}
+.stack div{height:100%} .g{background:#059669} .r{background:#dc2626} .a{background:#d97706}
+.legend{margin-top:8px;color:#5b6f79;font-size:13px}
+table{width:100%;border-collapse:collapse} th,td{padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:left}
+th{font-size:13px;color:#5b6f79} .n{text-align:right;font-variant-numeric:tabular-nums}
+.tag{padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;color:#fff}
+.tag.pass{background:#059669} .tag.fail{background:#dc2626} .tag.error{background:#d97706}
+.bar{background:#e2e8f0;border-radius:4px;height:10px;min-width:120px} .bar i{display:block;height:100%;background:#0f766e;border-radius:4px}
+.ok{color:#059669;font-weight:600;margin:0}
+</style></head><body>
+<header><h1>Test Report: LLM AI Gateway Dashboard</h1>
+<p>Platform: Ubuntu | Generated: 2026-11-13 15:49:44 | Result: ALL TESTS PASSED</p></header>
+<main>
+<div class="cards">
+<div class="card"><b>10</b><span>Total tests</span></div>
+<div class="card"><b style="color:#059669">10</b><span>Passed</span></div>
+<div class="card"><b style="color:#dc2626">0</b><span>Failed</span></div>
+<div class="card"><b style="color:#d97706">0</b><span>Errors</span></div>
+<div class="card"><b>100%</b><span>Pass rate</span></div>
+<div class="card"><b>8.5s</b><span>Total time</span></div>
+</div>
+<section><h2>Outcome breakdown</h2>
+<div class="stack"><div class="g" style="width:100.0%"></div><div class="r" style="width:0.0%"></div><div class="a" style="width:0.0%"></div></div>
+<div class="legend">Green = passed, red = failed (wrong total), amber = error (timeout or missing element)</div></section>
+<section><h2>Failed test cases</h2><p class='ok'>No failed test cases.</p></section>
+<section><h2>All test cases and execution times</h2>
+<table><tr><th>ID</th><th>Description</th><th class="n">Expected</th><th class="n">Actual</th><th>Status</th><th>Time</th><th class="n">Seconds</th></tr>
+<tr><td>TC01</td><td>Single model, whole number</td><td class='n'>29.26</td><td class='n'>29.26</td><td><span class='tag pass'>PASS</span></td><td><div class='bar'><i style='width:100%'></i></div></td><td class='n'>1.03s</td></tr>
+<tr><td>TC02</td><td>Three models, mixed usage</td><td class='n'>59.63</td><td class='n'>59.63</td><td><span class='tag pass'>PASS</span></td><td><div class='bar'><i style='width:79%'></i></div></td><td class='n'>0.81s</td></tr>
+<tr><td>TC03</td><td>All 8 models, 1M tokens each</td><td class='n'>52.89</td><td class='n'>52.89</td><td><span class='tag pass'>PASS</span></td><td><div class='bar'><i style='width:78%'></i></div></td><td class='n'>0.8s</td></tr>
+<tr><td>TC04</td><td>Boundary: zero usage on all models</td><td class='n'>0.00</td><td class='n'>0.00</td><td><span class='tag pass'>PASS</span></td><td><div class='bar'><i style='width:78%'></i></div></td><td class='n'>0.8s</td></tr>
+<tr><td>TC05</td><td>Decimal usage on two models</td><td class='n'>22.87</td><td class='n'>22.87</td><td><span class='tag pass'>PASS</span></td><td><div class='bar'><i style='width:80%'></i></div></td><td class='n'>0.82s</td></tr>
+<tr><td>TC06</td><td>Large usage on two models</td><td class='n'>19504.00</td><td class='n'>19504.00</td><td><span class='tag pass'>PASS</span></td><td><div class='bar'><i style='width:80%'></i></div></td><td class='n'>0.82s</td></tr>
+<tr><td>TC07</td><td>Batch API on, single model</td><td class='n'>14.63</td><td class='n'>14.63</td><td><span class='tag pass'>PASS</span></td><td><div class='bar'><i style='width:83%'></i></div></td><td class='n'>0.85s</td></tr>
+<tr><td>TC08</td><td>Batch API on, three models</td><td class='n'>52.58</td><td class='n'>52.58</td><td><span class='tag pass'>PASS</span></td><td><div class='bar'><i style='width:83%'></i></div></td><td class='n'>0.85s</td></tr>
+<tr><td>TC09</td><td>Rounding: half-sen lines and odd subtotal, batch on</td><td class='n'>0.74</td><td class='n'>0.74</td><td><span class='tag pass'>PASS</span></td><td><div class='bar'><i style='width:81%'></i></div></td><td class='n'>0.83s</td></tr>
+<tr><td>TC10</td><td>All 8 models with different usage, batch on</td><td class='n'>99.32</td><td class='n'>99.32</td><td><span class='tag pass'>PASS</span></td><td><div class='bar'><i style='width:83%'></i></div></td><td class='n'>0.85s</td></tr>
+</table></section>
+</main></body></html>
