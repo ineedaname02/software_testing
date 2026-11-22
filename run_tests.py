@@ -72,15 +72,13 @@ def run_case(driver, row):
         field = driver.find_element(By.ID, f"qty{i}")
         field.clear()
         field.send_keys(row[f"qty{i}"])
-
-    # Batch toggle: click only if its state differs from what the case wants
+      
     batch = driver.find_element(By.ID, "batch_toggle")
     if batch.is_selected() != (row["batch"].strip().lower() == "yes"):
         batch.click()
 
     driver.find_element(By.ID, "calc_button").click()
 
-    # Wait for the result, bring it into view, then read the total
     total_el = wait.until(EC.visibility_of_element_located((By.ID, "total_amount")))
     driver.execute_script("arguments[0].scrollIntoView({block:'center'});", total_el)
     time.sleep(0.3)
